@@ -9,93 +9,116 @@ public class MinHeap {
     private final PerformanceTracker tracker;
 
     public MinHeap() { this(16, new PerformanceTracker()); }
+
     public MinHeap(int capacity) { this(capacity, new PerformanceTracker()); }
+
     public MinHeap(int capacity, PerformanceTracker tracker) {
         this.heap = new int[Math.max(2, capacity)];
         this.size = 0;
-        this.tracker = tracker == null ? new PerformanceTracker() : tracker;
+        this.tracker = (tracker == null) ? new PerformanceTracker() : tracker;
+    }
+
+    public MinHeap(int[] arr, PerformanceTracker tracker) {
+        this(Math.max(arr.length, 16), tracker);
+        System.arraycopy(arr, 0, this.heap, 0, arr.length);
+        this.size = arr.length;
+        buildHeap();
+    }
+
+    private void ensureCapacity(int minCapacity) {
+        if (heap.length < minCapacity) {
+            int newCap = Math.max(heap.length * 2, minCapacity);
+            tracker.incrementAllocations();
+            heap = Arrays.copyOf(heap, newCap);
+        }
     }
 
     public void insert(int value) {
-        if (size == heap.length) resize();
-        heap[size] = value;
-        tracker.incrementAllocations();
-        siftUp(size++);
+        ensureCapacity(size + 1);
+        int i = size++;
+        while (i > 0) {
+            int p = (i - 1) / 2;
+            tracker.incrementComparisons();
+            if (heap[p] <= value) break;
+            heap[i] = heap[p];
+            tracker.incrementArrayAccesses();
+            i = p;
+        }
+        heap[i] = value;
+        tracker.incrementArrayAccesses();
     }
 
     public int extractMin() {
         if (size == 0) throw new IllegalStateException("Heap is empty");
-        int min = heap[0];
-        heap[0] = heap[--size];
-        siftDown(0);
-        return min;
+        int result = heap[0];
+        tracker.incrementArrayAccesses();
+        int val = heap[--size];
+        tracker.incrementArrayAccesses();
+        if (size > 0) siftDownWithVal(0, val);
+        return result;
     }
 
     public void decreaseKey(int index, int newValue) {
         if (index < 0 || index >= size) throw new IllegalArgumentException("Invalid index");
-        if (newValue > heap[index]) throw new IllegalArgumentException("New key is greater");
-        heap[index] = newValue;
-        siftUp(index);
-    }
-
-    public void merge(MinHeap other) {
-        int newSize = this.size + other.size;
-        int[] merged = Arrays.copyOf(this.heap, newSize);
-        System.arraycopy(other.heap, 0, merged, this.size, other.size);
-        this.heap = merged;
-        this.size = newSize;
-        buildHeap();
-    }
-
-    private void siftUp(int i) {
+        tracker.incrementArrayAccesses();
+        if (newValue > heap[index]) throw new IllegalArgumentException("New key is greater than current key");
+        int i = index;
         while (i > 0) {
             int p = (i - 1) / 2;
             tracker.incrementComparisons();
-            if (heap[i] < heap[p]) {
-                swap(i, p);
-                i = p;
-            } else break;
+            if (heap[p] <= newValue) break;
+            heap[i] = heap[p];
+            tracker.incrementArrayAccesses();
+            i = p;
         }
+        heap[i] = newValue;
+        tracker.incrementArrayAccesses();
     }
 
-    private void siftDown(int i) {
-        int n = size;
-        while (true) {
+    public void merge(MinHeap other) {
+        if (other == null || other.size == 0) return;
+        ensureCapacity(size + other.size);
+        System.arraycopy(other.heap, 0, heap, size, other.size);
+        tracker.incrementArrayAccesses();
+        size += other.size;
+        buildHeap();
+    }
+
+    private void siftDownWithVal(int i, int val) {
+        int half = size / 2;
+        while (i < half) {
             int left = 2 * i + 1;
-            int right = 2 * i + 2;
-            int smallest = i;
-            if (left < n) { tracker.incrementComparisons(); if (heap[left] < heap[smallest]) smallest = left; }
-            if (right < n) { tracker.incrementComparisons(); if (heap[right] < heap[smallest]) smallest = right; }
-            if (smallest != i) { swap(i, smallest); i = smallest; } else break;
+            int right = left + 1;
+            int smallest = left;
+
+            if (right < size && heap[right] < heap[left]) smallest = right;
+            tracker.incrementComparisons();
+
+            if (heap[smallest] >= val) break;
+            heap[i] = heap[smallest];
+            tracker.incrementArrayAccesses();
+            i = smallest;
         }
+        heap[i] = val;
+        tracker.incrementArrayAccesses();
     }
 
     private void buildHeap() {
-        for (int i = size / 2 - 1; i >= 0; i--) siftDown(i);
-    }
-
-    private void swap(int i, int j) {
-        tracker.incrementSwaps();
-        int t = heap[i];
-        heap[i] = heap[j];
-        heap[j] = t;
-    }
-
-    private void resize() {
-        tracker.incrementAllocations();
-        heap = Arrays.copyOf(heap, heap.length * 2);
+        for (int i = (size >> 1) - 1; i >= 0; i--) siftDownWithVal(i, heap[i]);
     }
 
     public int size() { return size; }
     public boolean isEmpty() { return size == 0; }
+
     public int peek() {
         if (size == 0) throw new IllegalStateException("Heap is empty");
+        tracker.incrementArrayAccesses();
         return heap[0];
     }
 
-
     public int findIndexOf(int value) {
         for (int i = 0; i < size; i++) {
+            tracker.incrementArrayAccesses();
             if (heap[i] == value) return i;
         }
         return -1;
