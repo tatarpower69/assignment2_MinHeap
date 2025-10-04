@@ -16,36 +16,45 @@ The implementation is integrated with a **PerformanceTracker** to measure key me
 - Efficient heap operations with O(log n) worst-case time complexity.
 - Metrics tracking for empirical validation.
 - CLI `BenchmarkRunner` for running performance tests on different input sizes and scenarios:
-    - Input sizes: 100, 1,000, 10,000, 100,000
-    - Input types: random, sorted, reversed, nearly-sorted
-    - CSV export of metrics for further analysis.
+  - Input sizes: 100, 1,000, 10,000, 100,000
+  - Input types: random, sorted, reversed, nearly-sorted
+  - CSV export of metrics for further analysis.
 
 ## Installation & Usage
 
 Clone the repository:
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/tatarpower69/assignment2_MinHeap.git
 cd assignment2-minheap
+````
+
 Build with Maven:
 
+```bash
 mvn clean install
-
+```
 
 Run tests:
 
+```bash
 mvn test
-
+```
 
 Run benchmark:
 
-mvn exec:java -Dexec.mainClass="org.example.cli.BenchmarkRunner" \
--Dexec.args="--algo MinHeap --n 10000 --case random --out results.csv"
+```bash
+mvn clean compile exec:java "-Dexec.mainClass=org.example.cli.BenchmarkRunner" "-Dexec.args=--algo MinHeap --n 10000 --case random --out results.csv"
 
+```
 
-Metrics CSV includes:
+**Metrics CSV** includes:
 
+```
 algorithm,case,n,time_ns,comparisons,swaps,allocations,arrayAccesses,maxDepth
+```
+
+## Complexity Analysis
 
 | Operation   | Worst Case (O) | Average Case (Θ) | Best Case (Ω) | Space Complexity |
 | ----------- | -------------- | ---------------- | ------------- | ---------------- |
@@ -55,27 +64,23 @@ algorithm,case,n,time_ns,comparisons,swaps,allocations,arrayAccesses,maxDepth
 | merge       | O(n)           | Θ(n)             | Ω(n)          | O(1)             |
 | buildHeap   | O(n)           | Θ(n)             | Ω(n)          | O(n)             |
 
-Observations from benchmarks
+## Observations from benchmarks
 
-insert and decreaseKey are fastest on reversed or nearly-sorted data due to minimal heap adjustments.
+* `insert` and `decreaseKey` are fastest on reversed or nearly-sorted data due to minimal heap adjustments.
+* `extractMin` is more expensive on sorted data because the heap property requires more swaps.
+* Comparisons and array accesses grow roughly proportionally to n log n, confirming theoretical expectations.
+* Memory allocations are minimal due to in-place array implementation and dynamic resizing.
 
-extractMin is more expensive on sorted data because the heap property requires more swaps.
+### Example metrics for n = 10,000 (random)
 
-Comparisons and array accesses grow roughly proportionally to n log n, confirming theoretical expectations.
+* `insert`: 315,000 ns, 22,500 comparisons, 55,000 array accesses
+* `extractMin`: 2,050,000 ns, 230,000 comparisons, 392,000 array accesses
+* `decreaseKey`: 710,000 ns, 27,500 comparisons, 80,000 array accesses
 
-Memory allocations are minimal due to in-place array implementation and dynamic resizing.
+## Conclusion
 
-Example metrics for n = 10,000 (random)
-
-insert: 315,000 ns, 22,500 comparisons, 55,000 array accesses
-
-extractMin: 2,050,000 ns, 230,000 comparisons, 392,000 array accesses
-
-decreaseKey: 710,000 ns, 27,500 comparisons, 80,000 array accesses
-
-Conclusion
-
-The Min-Heap implementation is correct, efficient, and scalable.
+The **Min-Heap** implementation is correct, efficient, and scalable.
 Empirical benchmarks confirm O(log n) behavior for all main operations.
 Optimizations (dynamic array resizing, minimal swaps) improve practical performance, especially on nearly-sorted data.
 Metrics tracking allows detailed performance analysis and verification of theoretical complexity.
+
