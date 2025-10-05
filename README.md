@@ -84,3 +84,10 @@ Empirical benchmarks confirm O(log n) behavior for all main operations.
 Optimizations (dynamic array resizing, minimal swaps) improve practical performance, especially on nearly-sorted data.
 Metrics tracking allows detailed performance analysis and verification of theoretical complexity.
 
+## 📊 Reports and Analysis
+
+- [Individual Analysis Report](./docs/Individual%20Analysis%20Report%20MaxHeap%20.pdf)
+- [Joint Summary Report](./docs/Cross%20Joint%20Summary.pdf)
+- Performance plots: `docs/performance-plots/`
+
+
