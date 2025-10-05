@@ -1,0 +1,13 @@
+algorithm,case,n,time_ns
+Arrays.sort,random,100,2106500
+Arrays.sort,sorted,100,5300
+Arrays.sort,reversed,100,5200
+Arrays.sort,nearly-sorted,100,17300
+Arrays.sort,random,1000,302400
+Arrays.sort,sorted,1000,23300
+Arrays.sort,reversed,1000,41500
+Arrays.sort,nearly-sorted,1000,138100
+Arrays.sort,random,10000,2480400
+Arrays.sort,sorted,10000,191100
+Arrays.sort,reversed,10000,332000
+Arrays.sort,nearly-sorted,10000,416600
