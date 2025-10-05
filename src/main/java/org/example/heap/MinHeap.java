@@ -19,10 +19,16 @@ public class MinHeap {
     }
 
     public MinHeap(int[] arr, PerformanceTracker tracker) {
-        this(Math.max(arr.length, 16), tracker);
-        System.arraycopy(arr, 0, this.heap, 0, arr.length);
-        this.size = arr.length;
-        buildHeap();
+        if (arr == null) {
+            this.heap = new int[16];
+            this.size = 0;
+        } else {
+            this.heap = new int[Math.max(arr.length, 16)];
+            System.arraycopy(arr, 0, this.heap, 0, arr.length);
+            this.size = arr.length;
+            buildHeap();
+        }
+        this.tracker = (tracker == null) ? new PerformanceTracker() : tracker;
     }
 
     private void ensureCapacity(int minCapacity) {

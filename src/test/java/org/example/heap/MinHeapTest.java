@@ -29,6 +29,32 @@ public class MinHeapTest {
     }
 
     @Test
+    void testNullArrayConstructor() {
+        MinHeap h = new MinHeap(null, new PerformanceTracker());
+        assertTrue(h.isEmpty());
+        assertEquals(0, h.size());
+        assertThrows(IllegalStateException.class, h::extractMin);
+    }
+
+    @Test
+    void testEmptyArrayConstructor() {
+        MinHeap h = new MinHeap(new int[0], new PerformanceTracker());
+        assertTrue(h.isEmpty());
+        assertEquals(0, h.size());
+        assertThrows(IllegalStateException.class, h::peek);
+    }
+
+    @Test
+    void testSingleElementArrayConstructor() {
+        MinHeap h = new MinHeap(new int[]{42}, new PerformanceTracker());
+        assertFalse(h.isEmpty());
+        assertEquals(1, h.size());
+        assertEquals(42, h.peek());
+        assertEquals(42, h.extractMin());
+        assertTrue(h.isEmpty());
+    }
+
+    @Test
     void testDuplicates() {
         MinHeap h = new MinHeap(8, new PerformanceTracker());
         h.insert(5); h.insert(5); h.insert(5);
